@@ -33,6 +33,6 @@ List<ItemCompra> ordenarItens(List<ItemCompra> itens, TipoOrdenacao tipo) {
 
 bool listaEmAndamento(List<ItemCompra> itens) {
   if (itens.isEmpty) return false;
-  final compradosCount = itens.where((i) => i.comprado).length;
-  return compradosCount > 0 && compradosCount < itens.length;
+  final concluidosCount = itens.where((i) => i.concluido).length;
+  return concluidosCount > 0 && concluidosCount < itens.length;
 }

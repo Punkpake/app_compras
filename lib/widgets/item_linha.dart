@@ -28,10 +28,10 @@ class ItemLinha extends StatelessWidget {
                 Text(
                   item.nome.isEmpty ? '(sem nome)' : item.nome,
                   style: TextStyle(
-                    color: item.comprado ? const Color(0xFF6B7280) : Colors.white,
+                    color: item.concluido ? const Color(0xFF6B7280) : Colors.white,
                     fontSize: 16,
                     fontWeight: FontWeight.w500,
-                    decoration: item.comprado ? TextDecoration.lineThrough : null,
+                    decoration: item.concluido ? TextDecoration.lineThrough : null,
                   ),
                 ),
                 const SizedBox(height: 2),
@@ -47,13 +47,13 @@ class ItemLinha extends StatelessWidget {
               height: 26,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: item.comprado ? const Color(0xFF22C55E) : Colors.transparent,
+                color: item.concluido ? const Color(0xFF22C55E) : Colors.transparent,
                 border: Border.all(
-                  color: item.comprado ? const Color(0xFF22C55E) : const Color(0xFF3B3B3B),
+                  color: item.concluido ? const Color(0xFF22C55E) : const Color(0xFF3B3B3B),
                   width: 2,
                 ),
               ),
-              child: item.comprado ? const Icon(Icons.check, size: 16, color: Colors.black) : null,
+              child: item.concluido ? const Icon(Icons.check, size: 16, color: Colors.black) : null,
             ),
           ),
         ],

@@ -75,7 +75,7 @@ class _TelaCriarListaState extends State<TelaCriarLista> {
         categoria: categoriaId,
         tipoMedida: 'Quantidade',
         quantidade: '1',
-        comprado: false,
+        concluido: false,
         ordem: _itens.length,
       ));
     });

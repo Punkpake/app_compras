@@ -83,8 +83,9 @@ class _TelaListaState extends State<TelaLista> {
 
                           onChanged: (valor) {
                             setState(() {
-                              item.concluido =
-                                  valor ?? false;
+                              widget.lista.itens[index] = item.copyWith(
+                                  concluido: valor ?? false,
+                              );
                             });
                           },
                         ),
