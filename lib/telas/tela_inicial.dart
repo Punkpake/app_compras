@@ -1,9 +1,7 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import '../models/lista.dart';
+import '../utils/armazenamento.dart';
 import 'tela_criar_lista.dart';
 import 'tela_lista.dart';
 
@@ -15,8 +13,7 @@ class TelaInicial extends StatefulWidget {
       _TelaInicialState();
 }
 
-class _TelaInicialState
-    extends State<TelaInicial> {
+class _TelaInicialState extends State<TelaInicial> {
   List<ListaCompras> listas = [];
 
   @override
@@ -25,41 +22,13 @@ class _TelaInicialState
     carregarListas();
   }
 
-  Future<void> salvarListas() async {
-    final prefs =
-        await SharedPreferences.getInstance();
-
-    final listasJson = listas
-        .map(
-          (lista) =>
-              jsonEncode(lista.toJson()),
-        )
-        .toList();
-
-    await prefs.setStringList(
-      'listas',
-      listasJson,
-    );
-  }
-
   Future<void> carregarListas() async {
-    final prefs =
-        await SharedPreferences.getInstance();
+    final listasCarregadas =
+        await Armazenamento.obterListas();
 
-    final listasJson =
-        prefs.getStringList('listas');
-
-    if (listasJson != null) {
+    if (mounted) {
       setState(() {
-        listas = listasJson.map(
-          (jsonString) {
-            return ListaCompras.fromJson(
-              Map<String, dynamic>.from(
-                jsonDecode(jsonString),
-              ),
-            );
-          },
-        ).toList();
+        listas = listasCarregadas;
       });
     }
   }
@@ -75,24 +44,23 @@ class _TelaInicialState
       ),
     );
 
-    await salvarListas();
-
-    if (mounted) {
-      setState(() {});
-    }
+    await carregarListas();
   }
 
-  Future<void> excluirLista(int index) async {
-    setState(() {
-      listas.removeAt(index);
-    });
+  Future<void> excluirLista(
+    int index,
+  ) async {
+    final lista = listas[index];
 
-    await salvarListas();
+    await Armazenamento.apagarListas([
+      lista.id,
+    ]);
+
+    await carregarListas();
   }
 
   Future<void> criarNovaLista() async {
-    final novaLista =
-        await Navigator.push<ListaCompras>(
+    await Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) =>
@@ -100,16 +68,7 @@ class _TelaInicialState
       ),
     );
 
-    if (novaLista != null) {
-      setState(() {
-        listas.insert(
-          0,
-          novaLista,
-        );
-      });
-
-      await salvarListas();
-    }
+    await carregarListas();
   }
 
   @override
