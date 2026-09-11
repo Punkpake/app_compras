@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../models/lista.dart';
 import 'tela_criar_lista.dart';
+import 'tela_lista.dart';
 
 class TelaInicial extends StatefulWidget {
   const TelaInicial({super.key});
@@ -16,82 +17,110 @@ class TelaInicial extends StatefulWidget {
 
 class _TelaInicialState
     extends State<TelaInicial> {
-
   List<ListaCompras> listas = [];
 
   @override
   void initState() {
-
     super.initState();
-
     carregarListas();
-
   }
 
   Future<void> salvarListas() async {
-
     final prefs =
         await SharedPreferences.getInstance();
 
-    List<String> listasJson =
-
-        listas.map((lista) {
-
-          return jsonEncode(
-            lista.toJson(),
-          );
-
-        }).toList();
+    final listasJson = listas
+        .map(
+          (lista) =>
+              jsonEncode(lista.toJson()),
+        )
+        .toList();
 
     await prefs.setStringList(
       'listas',
       listasJson,
     );
-
   }
 
   Future<void> carregarListas() async {
-
     final prefs =
         await SharedPreferences.getInstance();
 
-    List<String>? listasJson =
+    final listasJson =
         prefs.getStringList('listas');
 
     if (listasJson != null) {
-
       setState(() {
+        listas = listasJson.map(
+          (jsonString) {
+            return ListaCompras.fromJson(
+              Map<String, dynamic>.from(
+                jsonDecode(jsonString),
+              ),
+            );
+          },
+        ).toList();
+      });
+    }
+  }
 
-        listas =
-            listasJson.map((jsonString) {
+  Future<void> abrirLista(
+    ListaCompras lista,
+  ) async {
+    await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) =>
+            TelaLista(lista: lista),
+      ),
+    );
 
-          return ListaCompras.fromJson(
+    await salvarListas();
 
-            jsonDecode(jsonString),
+    if (mounted) {
+      setState(() {});
+    }
+  }
 
-          );
+  Future<void> excluirLista(int index) async {
+    setState(() {
+      listas.removeAt(index);
+    });
 
-        }).toList();
+    await salvarListas();
+  }
 
+  Future<void> criarNovaLista() async {
+    final novaLista =
+        await Navigator.push<ListaCompras>(
+      context,
+      MaterialPageRoute(
+        builder: (context) =>
+            const TelaCriarLista(),
+      ),
+    );
+
+    if (novaLista != null) {
+      setState(() {
+        listas.insert(
+          0,
+          novaLista,
+        );
       });
 
+      await salvarListas();
     }
-
   }
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
-
       backgroundColor: Colors.black,
 
       appBar: AppBar(
-
         backgroundColor: Colors.black,
 
         title: const Text(
-
           "Minhas Listas",
 
           style: TextStyle(
@@ -101,11 +130,8 @@ class _TelaInicialState
       ),
 
       body: listas.isEmpty
-
           ? const Center(
-
               child: Text(
-
                 "Nenhuma lista criada",
 
                 style: TextStyle(
@@ -114,117 +140,89 @@ class _TelaInicialState
                 ),
               ),
             )
-
           : ListView.builder(
-
               itemCount: listas.length,
 
-              itemBuilder:
-                  (context, index) {
-
+              itemBuilder: (context, index) {
                 final lista = listas[index];
 
                 return Padding(
-
                   padding:
                       const EdgeInsets.all(10),
 
-                  child: Container(
+                  child: InkWell(
+                    borderRadius:
+                        BorderRadius.circular(20),
 
-                    padding:
-                        const EdgeInsets.all(20),
+                    onTap: () async {
+                      await abrirLista(lista);
+                    },
 
-                    decoration: BoxDecoration(
+                    child: Container(
+                      padding:
+                          const EdgeInsets.all(20),
 
-                      color: Colors.grey[900],
+                      decoration: BoxDecoration(
+                        color: Colors.grey[900],
 
-                      borderRadius:
-                          BorderRadius.circular(
-                        20,
+                        borderRadius:
+                            BorderRadius.circular(20),
                       ),
-                    ),
 
-                    child: Row(
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment:
+                                  CrossAxisAlignment
+                                      .start,
 
-                      mainAxisAlignment:
-                          MainAxisAlignment
-                              .spaceBetween,
+                              children: [
+                                Text(
+                                  lista.nome,
 
-                      children: [
+                                  style:
+                                      const TextStyle(
+                                    color:
+                                        Colors.white,
 
-                        Expanded(
+                                    fontSize: 22,
 
-                          child: Column(
-
-                            crossAxisAlignment:
-                                CrossAxisAlignment
-                                    .start,
-
-                            children: [
-
-                              Text(
-
-                                lista.nome,
-
-                                style:
-                                    const TextStyle(
-
-                                  color:
-                                      Colors.white,
-
-                                  fontSize: 22,
-
-                                  fontWeight:
-                                      FontWeight
-                                          .bold,
+                                    fontWeight:
+                                        FontWeight.bold,
+                                  ),
                                 ),
-                              ),
 
-                              const SizedBox(
-                                height: 5,
-                              ),
-
-                              Text(
-
-                                "${lista.itens.length} itens",
-
-                                style:
-                                    TextStyle(
-
-                                  color:
-                                      Colors
-                                          .grey[400],
+                                const SizedBox(
+                                  height: 5,
                                 ),
-                              ),
-                            ],
+
+                                Text(
+                                  "${lista.itens.length} itens",
+
+                                  style: TextStyle(
+                                    color:
+                                        Colors.grey[400],
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
 
-                        IconButton(
-
-                          onPressed: () async {
-
-                            setState(() {
-
-                              listas.removeAt(
+                          IconButton(
+                            onPressed: () async {
+                              await excluirLista(
                                 index,
                               );
+                            },
 
-                            });
-
-                            await salvarListas();
-
-                          },
-
-                          icon: const Icon(
-
-                            Icons.delete,
-
-                            color:
-                                Colors.white,
+                            icon: const Icon(
+                              Icons.delete,
+                              color: Colors.white,
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                 );
@@ -233,38 +231,10 @@ class _TelaInicialState
 
       floatingActionButton:
           FloatingActionButton(
-
         backgroundColor: Colors.green,
 
         onPressed: () async {
-
-          final novaLista =
-              await Navigator.push(
-
-            context,
-
-            MaterialPageRoute(
-
-              builder: (context) =>
-                  const TelaCriarLista(),
-            ),
-          );
-
-          if (novaLista != null) {
-
-            setState(() {
-
-              listas.insert(
-                0,
-                novaLista,
-              );
-
-            });
-
-            await salvarListas();
-
-          }
-
+          await criarNovaLista();
         },
 
         child: const Icon(
