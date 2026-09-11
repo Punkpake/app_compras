@@ -4,7 +4,7 @@ class ItemCompra {
   final String categoria; // 'frios' | 'verduras' | 'prateleira' | 'limpeza'
   final String tipoMedida; // 'Quilo' | 'Litro' | 'Quantidade' | 'Dinheiro'
   final String quantidade;
-  final bool comprado;
+  final bool concluido;
   final int ordem;
 
   ItemCompra({
@@ -13,7 +13,7 @@ class ItemCompra {
     required this.categoria,
     required this.tipoMedida,
     required this.quantidade,
-    this.comprado = false,
+    this.concluido = false,
     required this.ordem,
   });
 
@@ -22,7 +22,7 @@ class ItemCompra {
     String? categoria,
     String? tipoMedida,
     String? quantidade,
-    bool? comprado,
+    bool? concluido,
     int? ordem,
   }) {
     return ItemCompra(
@@ -31,7 +31,7 @@ class ItemCompra {
       categoria: categoria ?? this.categoria,
       tipoMedida: tipoMedida ?? this.tipoMedida,
       quantidade: quantidade ?? this.quantidade,
-      comprado: comprado ?? this.comprado,
+      concluido: concluido ?? this.concluido,
       ordem: ordem ?? this.ordem,
     );
   }
@@ -42,7 +42,7 @@ class ItemCompra {
         'categoria': categoria,
         'tipoMedida': tipoMedida,
         'quantidade': quantidade,
-        'comprado': comprado,
+        'concluido': concluido,
         'ordem': ordem,
       };
 
@@ -52,7 +52,7 @@ class ItemCompra {
         categoria: json['categoria'] as String,
         tipoMedida: json['tipoMedida'] as String,
         quantidade: json['quantidade'] as String,
-        comprado: json['comprado'] as bool? ?? false,
+        concluido: json['concluido'] as bool? ?? false,
         ordem: json['ordem'] as int? ?? 0,
       );
 }
